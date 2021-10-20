@@ -9,8 +9,8 @@ using SalesWebMvc.Data;
 namespace SalesWebMvc.Migrations
 {
     [DbContext(typeof(SalesWebMvcContext))]
-    [Migration("20211020121240_teste")]
-    partial class teste
+    [Migration("20211020121240_AjustesNomeTabela")]
+    partial class AjustesNomeTabela
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -49,14 +50,14 @@ namespace SalesWebMvc.Controllers
             if (id == null)
             {
 
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided"});
             }
 
             var obj = _sellerService.FinById(id.Value);
             if (obj == null)
             {
 
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not faund" });
             }
 
             return View(obj);
@@ -76,14 +77,14 @@ namespace SalesWebMvc.Controllers
             if (id == null)
             {
 
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not prodided" });
             }
 
             var obj = _sellerService.FinById(id.Value);
             if (obj == null)
             {
 
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not faund" });
             }
 
             return View(obj);
@@ -94,13 +95,13 @@ namespace SalesWebMvc.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
 
             var obj = _sellerService.FinById(id.Value);
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not faund" });
             }
 
             List<Department> departments = _departmentService.FindAll();
@@ -115,7 +116,7 @@ namespace SalesWebMvc.Controllers
         {
             if (id != seller.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id  mismatch" });
             }
 
             try
@@ -124,15 +125,32 @@ namespace SalesWebMvc.Controllers
                 return RedirectToAction(nameof(Index));
 
             }
-            catch (NotFoundException)
-            {
 
-                return NotFound();
-            }
-            catch(DbConcurrencyException)
+            //Nesso usa o SuperTipo para economizar código
+            catch(ApplicationException E)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = E.Message }); 
             }
+
+            //catch (NotFoundException E)
+            //{
+
+            //    return RedirectToAction(nameof(Error), new { message = E.Message }); ;
+            //}
+            //catch(DbConcurrencyException E)
+            //{
+            //    return RedirectToAction(nameof(Error), new { message = E.Message }); ;
+            //}
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            return View(viewModel);
         }
     }
 }
